@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free PPC Budget & ROAS Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .calculators {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .calculator {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .calculator:hover {
+            transform: translateY(-5px);
+        }
+
+        .calculator h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .input-prefix + input {
+            padding-left: 30px;
+        }
+
+        .results {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .result-value.positive {
+            color: #38a169;
+        }
+
+        .result-value.negative {
+            color: #e53e3e;
+        }
+
+        .result-value.warning {
+            color: #d69e2e;
+        }
+
+        .recommendation {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .recommendation h4 {
+            color: #234e52;
+            margin-bottom: 8px;
+        }
+
+        .recommendation p {
+            color: #285e61;
+            margin-bottom: 5px;
+        }
+
+        .cta-section {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .calculators {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .calculator {
+                padding: 20px;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            color: #667eea;
+            cursor: help;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Free PPC Calculator Suite</h1>
+            <p>Calculate your ideal PPC budget and required ROAS for profitable campaigns</p>
+        </div>
+
+        <div class="calculators">
+            <!-- PPC Budget Calculator -->
+            <div class="calculator">
+                <h2>💰 PPC Budget Calculator</h2>
+                <form id="budgetForm">
+                    <div class="form-group">
+                        <label for="monthlyRevenue">Monthly Revenue Goal
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">How much revenue do you want to generate per month?</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">£</span>
+                            <input type="number" id="monthlyRevenue" placeholder="10000" min="0" step="100">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="averageOrderValue">Average Order Value (AOV)
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Average amount customers spend per purchase</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">£</span>
+                            <input type="number" id="averageOrderValue" placeholder="100" min="1" step="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conversionRate">Conversion Rate
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Percentage of website visitors who make a purchase</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" id="conversionRate" placeholder="2.5" min="0.1" max="50" step="0.1">
+                            <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #718096;">%</span>
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="growthGoal">Growth Strategy</label>
+                        <select id="growthGoal">
+                            <option value="conservative">Conservative (Safe Growth)</option>
+                            <option value="moderate">Moderate (Balanced Growth)</option>
+                            <option value="aggressive">Aggressive (Fast Growth)</option>
+                        </select>
+                    </div>
+                </form>
+
+                <div id="budgetResults" class="results" style="display: none;">
+                    <div class="result-item">
+                        <span class="result-label">Required Conversions:</span>
+                        <span class="result-value" id="requiredConversions">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Required Clicks:</span>
+                        <span class="result-value" id="requiredClicks">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Recommended Monthly Budget:</span>
+                        <span class="result-value" id="recommendedBudget">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Daily Budget:</span>
+                        <span class="result-value" id="dailyBudget">-</span>
+                    </div>
+                    <div id="budgetRecommendation" class="recommendation"></div>
+                </div>
+            </div>
+
+            <!-- Required ROAS Calculator -->
+            <div class="calculator">
+                <h2>🎯 Required ROAS Calculator</h2>
+                <form id="roasForm">
+                    <div class="form-group">
+                        <label for="productCost">Cost of Goods Sold (COGS)
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">What it costs you to produce/acquire your product</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">£</span>
+                            <input type="number" id="productCost" placeholder="40" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalCosts">Additional Costs
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Shipping, fulfillment, payment processing, VAT etc.</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">£</span>
+                            <input type="number" id="additionalCosts" placeholder="10" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sellingPrice">Selling Price
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">Price you sell the product for (after VAT if applicable)</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">£</span>
+                            <input type="number" id="sellingPrice" placeholder="100" min="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="desiredMargin">Desired Profit Margin
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">What percentage profit margin do you want after ad costs?</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <input type="number" id="desiredMargin" placeholder="15" min="0" max="80" step="1">
+                            <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #718096;">%</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="monthlyBudget">Monthly Ad Budget
+                            <span class="tooltip">ℹ️
+                                <span class="tooltiptext">How much you plan to spend on ads per month</span>
+                            </span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-prefix">£</span>
+                            <input type="number" id="monthlyBudget" placeholder="2000" min="0" step="100">
+                        </div>
+                    </div>
+                </form>
+
+                <div id="roasResults" class="results" style="display: none;">
+                    <div class="result-item">
+                        <span class="result-label">Gross Profit per Sale:</span>
+                        <span class="result-value" id="grossProfit">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Break-even ROAS:</span>
+                        <span class="result-value" id="breakEvenRoas">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Required ROAS (Target):</span>
+                        <span class="result-value positive" id="targetRoas">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Revenue Needed:</span>
+                        <span class="result-value" id="revenueNeeded">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Units to Sell:</span>
+                        <span class="result-value" id="unitsToSell">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2>Need Help Implementing These Numbers?</h2>
+            <p>Our PPC experts can help you create profitable campaigns that hit these targets.</p>
+            <a href="#" class="cta-button">Get Free PPC Audit</a>
+            <a href="#" class="cta-button">Book Strategy Call</a>
+        </div>
+    </div>
+
+    <script>
+
+
+        // Growth multipliers
+        const growthMultipliers = {
+            conservative: 1.0,
+            moderate: 1.3,
+            aggressive: 1.6
+        };
+
+        // Budget Calculator
+        function calculateBudget() {
+            const revenue = parseFloat(document.getElementById('monthlyRevenue').value) || 0;
+            const aov = parseFloat(document.getElementById('averageOrderValue').value) || 0;
+            const convRate = parseFloat(document.getElementById('conversionRate').value) || 0;
+            const growth = document.getElementById('growthGoal').value;
+
+            if (revenue === 0 || aov === 0 || convRate === 0) {
+                document.getElementById('budgetResults').style.display = 'none';
+                return;
+            }
+
+            const requiredConversions = Math.ceil(revenue / aov);
+            const requiredClicks = Math.ceil(requiredConversions / (convRate / 100));
+            const baseCPC = 1.50; // Average ecommerce CPC
+            const adjustedCPC = baseCPC * growthMultipliers[growth];
+            const monthlyBudget = Math.ceil(requiredClicks * adjustedCPC);
+            const dailyBudget = Math.ceil(monthlyBudget / 30);
+
+            // Update results
+            document.getElementById('requiredConversions').textContent = requiredConversions.toLocaleString();
+            document.getElementById('requiredClicks').textContent = requiredClicks.toLocaleString();
+            document.getElementById('recommendedBudget').textContent = '£' + monthlyBudget.toLocaleString();
+            document.getElementById('dailyBudget').textContent = '£' + dailyBudget.toLocaleString();
+
+            // Recommendation
+            let recommendation = `<h4>💡 Budget Recommendations:</h4>`;
+            recommendation += `<p>• Start with ${growth === 'aggressive' ? '100%' : growth === 'moderate' ? '70%' : '50%'} of recommended budget and scale up</p>`;
+            recommendation += `<p>• Expected Cost Per Acquisition: £${Math.ceil(adjustedCPC / (convRate / 100))}</p>`;
+            recommendation += `<p>• Monitor performance daily for first 2 weeks</p>`;
+            
+            if (dailyBudget > 333) {
+                recommendation += `<p>⚠️ High daily budget - consider testing with smaller amounts first</p>`;
+            }
+
+            document.getElementById('budgetRecommendation').innerHTML = recommendation;
+            document.getElementById('budgetResults').style.display = 'block';
+        }
+
+        // Required ROAS Calculator
+        function calculateROAS() {
+            const cogs = parseFloat(document.getElementById('productCost').value) || 0;
+            const additionalCosts = parseFloat(document.getElementById('additionalCosts').value) || 0;
+            const price = parseFloat(document.getElementById('sellingPrice').value) || 0;
+            const desiredMargin = parseFloat(document.getElementById('desiredMargin').value) || 0;
+            const monthlyBudget = parseFloat(document.getElementById('monthlyBudget').value) || 0;
+
+            if (cogs === 0 || price === 0 || desiredMargin === 0 || monthlyBudget === 0) {
+                document.getElementById('roasResults').style.display = 'none';
+                return;
+            }
+
+            const totalCosts = cogs + additionalCosts;
+            const grossProfit = price - totalCosts;
+            
+            // Break-even ROAS (just cover costs)
+            const breakEvenRoas = price / grossProfit;
+            
+            // Required ROAS to achieve desired margin
+            // Formula: Price / (Gross Profit - (Price * Desired Margin / 100))
+            const desiredProfitAmount = price * (desiredMargin / 100);
+            const remainingProfitForAds = grossProfit - desiredProfitAmount;
+            const targetRoas = price / remainingProfitForAds;
+            
+            // Revenue needed to hit budget at target ROAS
+            const revenueNeeded = monthlyBudget * targetRoas;
+            const unitsToSell = Math.ceil(revenueNeeded / price);
+
+            // Update results
+            document.getElementById('grossProfit').textContent = '£' + grossProfit.toFixed(2);
+            document.getElementById('breakEvenRoas').textContent = breakEvenRoas.toFixed(2) + ':1';
+            document.getElementById('targetRoas').textContent = targetRoas.toFixed(2) + ':1';
+            document.getElementById('revenueNeeded').textContent = '£' + revenueNeeded.toLocaleString();
+            document.getElementById('unitsToSell').textContent = unitsToSell.toLocaleString();
+
+            document.getElementById('roasResults').style.display = 'block';
+        }
+
+        // Event listeners
+        document.getElementById('budgetForm').addEventListener('input', calculateBudget);
+        document.getElementById('roasForm').addEventListener('input', calculateROAS);
+
+        // Initialize with sample data
+        window.addEventListener('load', function() {
+            // Set sample values
+            document.getElementById('monthlyRevenue').value = '10000';
+            document.getElementById('averageOrderValue').value = '100';
+            document.getElementById('conversionRate').value = '2.5';
+            
+            document.getElementById('productCost').value = '40';
+            document.getElementById('additionalCosts').value = '10';
+            document.getElementById('sellingPrice').value = '100';
+            document.getElementById('desiredMargin').value = '15';
+            document.getElementById('monthlyBudget').value = '2000';
+
+            // Calculate initial results
+            calculateBudget();
+            calculateROAS();
+        });
+    </script>
+</body>
+</html>
